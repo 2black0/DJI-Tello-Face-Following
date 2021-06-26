@@ -43,7 +43,7 @@ def showCam(img, imgsize):
         up_val = 0
         y_val = 0
 
-        if args.tello is False:
+        if args.tello is True:
             if eX < -error_threshold or eX >= error_threshold:
                 y_val = -eX
             else:
