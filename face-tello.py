@@ -71,7 +71,6 @@ if __name__=="__main__":
             myFrame = frame_read.frame
             img = cv2.resize(myFrame, args.vsize)
 
-            #if cv2.waitKey(1) & 0xFF == ord('t') and status_flying is False:
             if keyboard.is_pressed('t') and status_flying is False:
                 status_flying = True
                 tello.takeoff()
@@ -81,8 +80,6 @@ if __name__=="__main__":
             if not ret:
                 break
         
-        #cv2.imshow("Camera", img)
-        #lr_vel, fb_vel, up_vel, y_vel = [0, 0, 0, 0]
         lr_vel, fb_vel, up_vel, y_vel = showCam(img, args.vsize, args.tello, status_flying)
         
         if args.tello is True and status_flying is True:
@@ -98,13 +95,3 @@ if __name__=="__main__":
                 cap.release()
             cv2.destroyAllWindows()
             break
-
-    '''cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    while True:
-        ret, img = cap.read()
-        cv2.imshow("Camera", img)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cap.release()
-            cv2.destroyAllWindows()
-            break'''
