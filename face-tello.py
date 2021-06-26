@@ -59,8 +59,8 @@ def showCam(img, imgsize):
             else: 
                 fb_vel = 0
 
-            #tello.send_rc_control(lr_vel, fb_vel, up_val, y_val)
             print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} | y_val:{} | up_val:{} | fb_vel:{}".format(x, y, w, h, eX, eY, eZ, y_val, up_val, fb_vel))
+            tello.send_rc_control(lr_vel, fb_vel, up_val, y_val)
 
     cv2.imshow("Camera", img)
 
