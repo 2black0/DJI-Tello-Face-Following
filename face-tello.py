@@ -14,13 +14,24 @@ def showCam(img, imgsize):
             )
 
     for (x,y,w,h) in faces:
-        cv2.circle(img, (int(imgsize[0]/2), int(imgsize[1]/2)), 2, (0, 0, 255), 2)
-        cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
+        cent_X = int(imgsize[0]/2)
+        cent_Y = int(imgsize[1]/2)
+        cent_box_X = int((w/2)+x)
+        cent_box_Y = int((h/2)+y)
 
-        cv2.circle(img, (int((w/2)+x), int((h/2)+y)), 2, (0, 255, 0), 2)
+        size = 75
+        area = (size*2) * (size*2)
+        area_box = h * h
+
+        cv2.circle(img, (cent_X, cent_Y), 2, (0, 0, 255), 2)
+        cv2.rectangle(img, (int(cent_X-size), int(cent_Y-size)), (int(cent_X+size), int(cent_Y+size)), (0, 255, 0), 2)
+
+        cv2.circle(img, (cent_box_X, cent_box_Y), 2, (0, 255, 0), 2)
         cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
 
         cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
+        print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} ".format(x, y, w, h, cent_X-cent_box_X, cent_Y-cent_box_Y, area-area_box))
+
     cv2.imshow("Camera", img)
 
 if __name__=="__main__":
