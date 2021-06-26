@@ -1,6 +1,7 @@
 import cv2
 from djitellopy import Tello
 import argparse
+import keyboard 
 
 faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
@@ -70,7 +71,8 @@ if __name__=="__main__":
             myFrame = frame_read.frame
             img = cv2.resize(myFrame, args.vsize)
 
-            if cv2.waitKey(1) & 0xFF == ord('t') and status_flying is False:
+            #if cv2.waitKey(1) & 0xFF == ord('t') and status_flying is False:
+            if keyboard.is_pressed('t') and status_flying is False:
                 status_flying = True
                 tello.takeoff()
         else:
