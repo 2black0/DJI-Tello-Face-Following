@@ -30,6 +30,7 @@ def webcam_face_detect(video_mode, nogui = False, cascasdepath = "haarcascade_fr
                 cv2.rectangle(image, (x,y), (x+h, y+h), (0, 255, 0), 2)
                 cv2.circle(image, (int((w/2)+x), int((h/2)+y)), 2, (0, 255, 0), 2)
             cv2.imshow("Faces found", image)
+            
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 

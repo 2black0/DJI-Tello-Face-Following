@@ -1,47 +1,45 @@
-##################################################
-### Real time data plotter in opencv (python)  ###
-## Plot integer data for debugging and analysis ##
-## Contributors - Vinay @ www.connect.vin       ##
-## For more details, check www.github.com/2vin  ##
-##################################################
+#!/usr/bin/python
 
+import sys
 import cv2
-import numpy as np
 
-# Plot values in opencv program
-class Plotter:
-	def __init__(self, plot_width, plot_height):
-	    self.width = plot_width
-	    self.height = plot_height
-	    self.color = (255, 0 ,0)
-	    self.val = []
-	    self.plot_canvas = np.ones((self.height, self.width, 3))*255
+def webcam_face_detect(video_mode, nogui = False, cascasdepath = "haarcascade_frontalface_default.xml"):
+    face_cascade = cv2.CascadeClassifier(cascasdepath)
+    video_capture = cv2.VideoCapture(video_mode)
+    num_faces = 0
 
-	# Update new values in plot
-	def plot(self, val, label = "plot"):
-		self.val.append(int(val))
-		while len(self.val) > self.width:
-			self.val.pop(0)
+    while True:
+        ret, image = video_capture.read()
+        if not ret:
+            break
 
-		self.show_plot(label)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor = 1.2,
+            minNeighbors = 5,
+            minSize = (30,30)
+            )
 
-    # Show plot using opencv imshow
-	def show_plot(self, label):
-		self.plot_canvas = np.ones((self.height, self.width, 3))*255
-		cv2.line(self.plot_canvas, (0, int(self.height/2) ), (self.width, int(self.height/2)), (0,255,0), 1)
-		for i in range(len(self.val)-1):
-			cv2.line(self.plot_canvas, (i, int(self.height/2) - self.val[i]), (i+1, int(self.height/2) - self.val[i+1]), self.color, 1)
+        print("The number of faces found = ", len(faces))
+        num_faces = len(faces)
 
-		cv2.imshow(label, self.plot_canvas)
-		cv2.waitKey(10)
+        if not nogui:
+            for (x,y,w,h) in faces:
+                cv2.circle(image, (320, 240), 2, (0, 0, 255), 2)
+                cv2.rectangle(image, (x,y), (x+h, y+h), (0, 255, 0), 2)
+                cv2.circle(image, (int((w/2)+x), int((h/2)+y)), 2, (0, 255, 0), 2)
+            cv2.imshow("Faces found", image)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
+    video_capture.release()
+    cv2.destroyAllWindows()
+    return num_faces
 
-## Test on sample data
-
-# Create a plotter class object
-p = Plotter(400, 200)
-
-# Create dummy values using for loop 
-for v in range(500):
-	# call 'plot' method for realtime plot
-	p.plot(v/5)
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        video_mode= 0
+    else:
+        video_mode = sys.argv[1]
+    webcam_face_detect(video_mode)
