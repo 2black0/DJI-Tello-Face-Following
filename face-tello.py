@@ -34,37 +34,31 @@ if __name__=="__main__":
         print('Camera source is Tello')
         tello = Tello()
         tello.connect()
-
         print('Battery:',tello.get_battery())
         tello.streamoff()
         tello.streamon()
-
-        while True:
-            frame_read = tello.get_frame_read()
-            myFrame = frame_read.frame
-            img = cv2.resize(myFrame, args.vsize)
-
-            showCam(img, args.vsize)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                tello.streamoff()
-                cv2.destroyAllWindows()
-                break
-
     else:
         print('Camera source is Webcam')
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         cap.set(3, args.vsize[0])
         cap.set(4, args.vsize[1])
 
-        while True:
+    while True:
+        if args.tello is True:
+            frame_read = tello.get_frame_read()
+            myFrame = frame_read.frame
+            img = cv2.resize(myFrame, args.vsize)
+        else:
             ret, img = cap.read()
             if not ret:
                 break
+        
+        showCam(img, args.vsize)
 
-            showCam(img, args.vsize)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            if args.tello is True:
+                tello.streamoff()
+            else:
                 cap.release()
-                cv2.destroyAllWindows()
-                break
+            cv2.destroyAllWindows()
+            break
