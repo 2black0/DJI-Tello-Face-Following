@@ -1,3 +1,2 @@
-# Warning: DEPRECATED
+# face tracking for dji tello
 
-Please use the repo for my book, available here: https://github.com/shantnu/PyEng
