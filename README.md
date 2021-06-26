@@ -1,2 +1,1 @@
-# face tracking for dji tello
-
+# face tracking for dji tello using OpenCV
