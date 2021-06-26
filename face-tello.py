@@ -29,8 +29,38 @@ def showCam(img, imgsize):
         cv2.circle(img, (cent_box_X, cent_box_Y), 2, (0, 255, 0), 2)
         cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
 
+        eX = round((cent_X-cent_box_X) / cent_X * 100)
+        eY = round((cent_Y-cent_box_Y) / cent_Y * 100)
+        eZ = round((area-area_box) / area * 100)
+
+        error_threshold = 10
+
         cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
-        print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} ".format(x, y, w, h, cent_X-cent_box_X, cent_Y-cent_box_Y, area-area_box))
+        #print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} ".format(x, y, w, h, eX, eY, eZ))
+
+        lr_vel = 0
+        fb_vel = 0
+        up_val = 0
+        y_val = 0
+
+        if args.tello is False:
+            if eX < -error_threshold or eX >= error_threshold:
+                y_val = -eX
+            else:
+                y_val = 0
+
+            if eY < -error_threshold or eY >= error_threshold:
+                up_val = -eY
+            else: 
+                up_val = 0
+
+            if eZ < -error_threshold or eZ >= error_threshold:
+                fb_vel = eZ
+            else: 
+                fb_vel = 0
+
+            #tello.send_rc_control(lr_vel, fb_vel, up_val, y_val)
+            print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} | y_val:{} | up_val:{} | fb_vel:{}".format(x, y, w, h, eX, eY, eZ, y_val, up_val, fb_vel))
 
     cv2.imshow("Camera", img)
 
