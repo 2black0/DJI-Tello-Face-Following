@@ -8,17 +8,9 @@ faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 def showCam(img, imgsize, tellos, status):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor = 1.2,
-            minNeighbors = 5,
-            minSize = (30,30)
-            )
+    faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5, minSize = (30,30))
 
-    lr_vel = 0
-    fb_vel = 0
-    up_vel = 0
-    y_vel = 0
+    vel = [0, 0, 0, 0]
 
     for (x,y,w,h) in faces:
         cent_X = int(imgsize[0]/2)
@@ -29,52 +21,37 @@ def showCam(img, imgsize, tellos, status):
         size = 50
         area = (size*2) * (size*2)
         area_box = h * h
-
-        cv2.circle(img, (cent_X, cent_Y), 2, (0, 0, 255), 2)
-        cv2.rectangle(img, (int(cent_X-size), int(cent_Y-size)), (int(cent_X+size), int(cent_Y+size)), (0, 255, 0), 2)
-
-        cv2.circle(img, (cent_box_X, cent_box_Y), 2, (0, 255, 0), 2)
-        cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
+        error_threshold = 5
 
         eX = round((cent_X-cent_box_X) / cent_X * 100)
         eY = round((cent_Y-cent_box_Y) / cent_Y * 100)
         eZ = round((area-area_box) / area * 100)
 
-        error_threshold = 5
-
+        cv2.circle(img, (cent_X, cent_Y), 2, (0, 0, 255), 2)
+        cv2.rectangle(img, (int(cent_X-size), int(cent_Y-size)), (int(cent_X+size), int(cent_Y+size)), (0, 255, 0), 2)
+        cv2.circle(img, (cent_box_X, cent_box_Y), 2, (0, 255, 0), 2)
+        cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
         cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
-        #print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} ".format(x, y, w, h, eX, eY, eZ))
 
-        if status is True:
-            if tellos is True:
-                if eX < -error_threshold or eX >= error_threshold:
-                    y_vel = math.floor(-eX*1.15)
-                    if y_vel >= 100:
-                        y_vel = 100
-                    elif y_vel <= -100:
-                        y_vel = -100
-                else:
-                    y_vel = 0
+        if tellos is True and status is True:
+            if eX < -error_threshold or eX >= error_threshold:
+                vel[3] = -eX
+            else:
+                vel[3] = 0
 
-                if eY < -error_threshold or eY >= error_threshold:
-                    up_vel = math.floor(eY*1.15)
-                    if up_vel >= 100:
-                        up_vel = 100
-                    elif up_vel <= -100:
-                        up_vel = -100
-                else: 
-                    up_vel = 0
+            if eY < -error_threshold or eY >= error_threshold:
+                vel[2] = eY
+            else: 
+                vel[2] = 0
 
-                if eZ < -error_threshold or eZ >= error_threshold:
-                    fb_vel = int(eZ/2.5)
-                else: 
-                    fb_vel = 0
-
-                #tello.send_rc_control(lr_vel, fb_vel, up_val, y_val)
-            print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} | y_val:{} | up_val:{} | fb_vel:{}".format(x, y, w, h, eX, eY, eZ, y_vel, up_vel, fb_vel))
+            if eZ < -error_threshold or eZ >= error_threshold:
+                vel[1] = int(eZ/3)
+            else: 
+                vel[1] = 0
+        print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} | y_val:{} | up_val:{} | fb_vel:{}".format(x, y, w, h, eX, eY, eZ, vel[3], vel[2], vel[1]))
 
     cv2.imshow("Camera", img)
-    return ([lr_vel, fb_vel, up_vel, y_vel])
+    return (vel)
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='DJI Tello Object Tracking\n')
@@ -82,6 +59,8 @@ if __name__=="__main__":
     parser.add_argument('-vsize', nargs='+', type=int, default=[640, 480])
 
     args = parser.parse_args()
+    status_flying = False
+
     if args.tello is True:
         print('Camera source is Tello')
         tello = Tello()
@@ -101,32 +80,23 @@ if __name__=="__main__":
             myFrame = frame_read.frame
             img = cv2.resize(myFrame, args.vsize)
 
-            status = True
-            if keyboard.is_pressed('t') and status is True:
-                status = True
+            if keyboard.is_pressed('t') and status_flying is False:
+                status_flying = True
                 tello.takeoff()
         else:
-            status = True
+            status_flying = True
             ret, img = cap.read()
             if not ret:
                 break
         
-        lr_vel, fb_vel, up_vel, y_vel = showCam(img, args.vsize, args.tello, status)
-        height = tello.get_height()
+        lr_vel, fb_vel, up_vel, y_vel = showCam(img, args.vsize, args.tello, status_flying)
+        
+        if args.tello is True and status_flying is True:
+            height = tello.get_height()
+            if height > 50:
+                tello.send_rc_control(lr_vel, fb_vel, up_vel, y_vel)
 
-        if args.tello is True and status is True and height > 50:
-            tello.send_rc_control(lr_vel, fb_vel, up_vel, y_vel)
-
-        '''if keyboard.is_pressed('l'):
-            if args.tello is True:
-                tello.land()
-                tello.streamoff()
-            else:
-                cap.release()
-            cv2.destroyAllWindows()
-            break'''
-
-        if cv2.waitKey(1) & 0xFF == ord('l'):
+        if keyboard.is_pressed('l'):
             if args.tello is True:
                 tello.land()
                 tello.streamoff()
