@@ -98,7 +98,7 @@ if __name__=="__main__":
                 status_flying = True
                 tello.takeoff()
         else:
-            battery = 100
+            battery = 0
             height = 0
             flight_time = 0
             roll = 0
