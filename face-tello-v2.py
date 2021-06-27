@@ -6,7 +6,7 @@ import logging
 
 faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-def showCam(img, imgsize, tellos, status, data, debug, box, osd):
+def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
     vel = [0, 0, 0, 0]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5, minSize = (30,30))
@@ -51,6 +51,8 @@ def showCam(img, imgsize, tellos, status, data, debug, box, osd):
             print("x:{} | y:{} | w:{} | h:{} | eX:{} | eY:{} | eZ:{} | y_val:{} | up_val:{} | fb_vel:{}".format(x, y, w, h, eX, eY, eZ, vel[3], vel[2], vel[1]))
 
     cv2.imshow("Camera", img)
+    if save is True:
+        video.write(img)
     return (vel)
 
 if __name__=="__main__":
@@ -58,8 +60,9 @@ if __name__=="__main__":
     parser.add_argument('-tello', type=bool, help='Camera source, default is webcam', default=False)
     parser.add_argument('-vsize', nargs='+', type=int, default=[640, 480])
     parser.add_argument('-debug', type=bool, help='Enable debug', default=False)
-    parser.add_argument('-box', type=bool, help='Enable bounding box', default=False)
+    parser.add_argument('-box', type=bool, help='Enable bounding box', default=True)
     parser.add_argument('-osd', type=bool, help='Enable on screen display', default=False)
+    parser.add_argument('-save', type=bool, help='Save video', default=False)
 
     args = parser.parse_args()
 
@@ -76,6 +79,10 @@ if __name__=="__main__":
         cap.set(3, args.vsize[0])
         cap.set(4, args.vsize[1])
 
+    videoWriter = 0
+    if args.save is True:
+        fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
+        videoWriter = cv2.VideoWriter('./video.avi', fourcc, 20, (args.vsize[0],args.vsize[1]))
     status_flying = False
     while True:
         if args.tello is True:
@@ -115,7 +122,7 @@ if __name__=="__main__":
                 break
         
         data = [battery, height, flight_time, roll, pitch, yaw, speed_x, speed_y, speed_z, temp]
-        lr_vel, fb_vel, up_vel, y_vel = showCam(img, args.vsize, args.tello, status_flying, data, args.debug, args.box, args.osd)
+        lr_vel, fb_vel, up_vel, y_vel = showCam(img, args.vsize, args.tello, status_flying, data, args.debug, args.box, args.osd, args.save, videoWriter)
         
         if args.tello is True and status_flying is True:
             height = tello.get_height()
@@ -130,5 +137,7 @@ if __name__=="__main__":
                 tello.streamoff()
             else:
                 cap.release()
+            if args.save is True:
+                videoWriter.release()
             cv2.destroyAllWindows()
             break
