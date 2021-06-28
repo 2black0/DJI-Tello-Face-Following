@@ -15,6 +15,7 @@ def calculateError(centerX, centerY, centerH, centerBoxX, centerBoxY, boxH):
              round((centerY - centerBoxY) / centerY * 100), #error Y
              round((centerH - boxH/2) / centerH * 100) #error Z
             ]
+    #limit the max error to 100
     a = 0
     for i in error:
         if i >= 100:
