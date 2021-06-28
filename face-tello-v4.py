@@ -27,12 +27,11 @@ def calculateError(centerX, centerY, centerH, centerBoxX, centerBoxY, boxH):
 def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
     global error_threshold
     global size
-    vel = []
+    vel = [0, 0, 0, 0]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5, minSize = (30,30))
 
     for (x, y, w, h) in faces:
-        vel = [0, 0, 0, 0]
         cent_X = int(imgsize[0]/2)
         cent_Y = int(imgsize[1]/2)
         cent_box_X = int((w/2)+x)
@@ -103,6 +102,7 @@ def main():
         tello.connect()
         tello.streamoff()
         tello.streamon()
+        frame_read = tello.get_frame_read()
     else:
         print('Camera source is Webcam')
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -121,9 +121,8 @@ def main():
     while True:
         #getting image from tello
         if args.tello is True:
-            frame_read = tello.get_frame_read()
-            myFrame = frame_read.frame
-            img = cv2.resize(myFrame, args.vsize)
+            img = frame_read.frame
+            img = cv2.resize(img, args.vsize)
 
             #get status of tello
             stat = getStatus(tello)
@@ -152,7 +151,7 @@ def main():
         if args.tello is True and status_flying is True and status_detect is True:
             height = tello.get_height()
             if height > 30:
-                tello.send_rc_control(velocity[0], velocity[1], velocity[2], velocity[3],)
+                tello.send_rc_control(velocity[0], velocity[1], velocity[2], velocity[3])
         elif args.tello is True and status_detect is False:
             tello.send_rc_control(0, 0, 0, 0)
     
@@ -163,6 +162,7 @@ def main():
                 height = tello.get_height()
                 if height > 30:
                     tello.land()
+                frame_read.stop()    
                 tello.streamoff()
             else:
                 cap.release()
