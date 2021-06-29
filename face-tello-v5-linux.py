@@ -1,7 +1,8 @@
 import cv2
 from djitellopy import Tello
 import argparse
-import keyboard 
+import pygame
+import sys
 import logging
 
 faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -9,6 +10,9 @@ faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #parameter control
 error_threshold = 2
 size = 40
+
+pygame.init()
+display = pygame.display.set_mode((300, 300))
 
 def calculateError(centerX, centerY, centerH, centerBoxX, centerBoxY, boxH):
     error = [round((centerX - centerBoxX) / centerX * 100), #error X
@@ -106,7 +110,7 @@ def main():
         frame_read = tello.get_frame_read()
     else:
         print('Camera source is Webcam')
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0)#, cv2.CAP_DSHOW)
         cap.set(3, args.vsize[0])
         cap.set(4, args.vsize[1])
 
@@ -127,10 +131,27 @@ def main():
 
             #get status of tello
             stat = getStatus(tello)
-           
-            if keyboard.is_pressed('t') and status_flying is False:
-                status_flying = True
-                tello.takeoff()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    if args.tello is True:
+                        height = tello.get_height()
+                        if height > 30:
+                            tello.land()
+                        frame_read.stop()    
+                        tello.streamoff()
+                    else:
+                        cap.release()
+                    if args.save is True:
+                        videoWriter.release()
+                    cv2.destroyAllWindows()
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_t and status_flying is False:
+                        status_flying = True
+                        tello.takeoff()
+
         #getting image from webcam
         else:
             #for camera status is 0 and status flying is True
@@ -144,10 +165,26 @@ def main():
         velocity = showCam(img, args.vsize, args.tello, status_flying, stat, args.debug, args.box, args.osd, args.save, videoWriter)
         
         #enable / disable detection mode
-        if keyboard.is_pressed('d') and status_detect is False:
-            status_detect = True        
-        if keyboard.is_pressed('s') and status_detect is True:
-            status_detect = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                if args.tello is True:
+                    height = tello.get_height()
+                    if height > 30:
+                        tello.land()
+                    frame_read.stop()    
+                    tello.streamoff()
+                else:
+                    cap.release()
+                if args.save is True:
+                    videoWriter.release()
+                cv2.destroyAllWindows()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_d and status_detect is False:
+                    status_detect = True
+                if event.key == pygame.K_s and status_detect is True:
+                    status_detect = False
 
         #signal control the drone
         if args.tello is True and status_flying is True and status_detect is True:
@@ -157,21 +194,38 @@ def main():
         elif args.tello is True and status_detect is False:
             tello.send_rc_control(0, 0, 0, 0)
     
-
+        cv2.waitKey(1)
         #close the camera, land the drone and exit from looping
-        if (cv2.waitKey(1) & 0xFF == ord('l')):
-            if args.tello is True:
-                height = tello.get_height()
-                if height > 30:
-                    tello.land()
-                frame_read.stop()    
-                tello.streamoff()
-            else:
-                cap.release()
-            if args.save is True:
-                videoWriter.release()
-            cv2.destroyAllWindows()
-            break
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                if args.tello is True:
+                    height = tello.get_height()
+                    if height > 30:
+                        tello.land()
+                    frame_read.stop()    
+                    tello.streamoff()
+                else:
+                    cap.release()
+                if args.save is True:
+                    videoWriter.release()
+                cv2.destroyAllWindows()
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_l:
+                    if args.tello is True:
+                        height = tello.get_height()
+                        if height > 30:
+                            tello.land()
+                        frame_read.stop()    
+                        tello.streamoff()
+                    else:
+                        cap.release()
+                    if args.save is True:
+                        videoWriter.release()
+                    cv2.destroyAllWindows()
+                    break
 
 if __name__=="__main__":
     main()
