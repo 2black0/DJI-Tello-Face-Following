@@ -15,7 +15,7 @@ while True:
         center = bboxs[0]["center"]
         cv2.circle(img, center, 5, (255, 0, 255), cv2.FILLED)
 
-    fps, img = fpsReader.update(img,pos=(10,30),color=(0,255,255),scale=2,thickness=2)
+    fps, img = fpsReader.update(img,pos=(10,30),color=(0,255,0),scale=2,thickness=2)
     cv2.imshow("Image", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
