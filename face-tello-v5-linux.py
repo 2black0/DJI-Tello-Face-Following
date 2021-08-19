@@ -110,7 +110,7 @@ def main():
         frame_read = tello.get_frame_read()
     else:
         print('Camera source is Webcam')
-        cap = cv2.VideoCapture(0)#, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(1)#, cv2.CAP_DSHOW)
         cap.set(3, args.vsize[0])
         cap.set(4, args.vsize[1])
 
