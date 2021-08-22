@@ -45,11 +45,11 @@ def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
         error = calculateError(cent_X, cent_Y, size, cent_box_X, cent_box_Y, h)
 
         if box is True:
-            #cv2.circle(img, (cent_X, cent_Y), 2, (0, 0, 255), 2)
-            #cv2.rectangle(img, (int(cent_X-size), int(cent_Y-size)), (int(cent_X+size), int(cent_Y+size)), (0, 255, 0), 2)
+            cv2.circle(img, (cent_X, cent_Y), 2, (0, 0, 255), 2)
+            cv2.rectangle(img, (int(cent_X-size), int(cent_Y-size)), (int(cent_X+size), int(cent_Y+size)), (0, 255, 0), 2)
             cv2.circle(img, (cent_box_X, cent_box_Y), 2, (0, 255, 0), 2)
             cv2.rectangle(img, (x,y), (x+h, y+h), (0, 255, 0), 2)
-            #cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
+            cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
 
         if osd is True:
             cv2.putText(img, 'B:'+str(data[0])+' H:'+str(data[1])+' FT:'+str(data[2])+' T:'+str(data[9]), (10, imgsize[1]-10), 2, 1, (0, 255, 0), 2)
