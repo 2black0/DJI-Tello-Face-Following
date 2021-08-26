@@ -87,16 +87,16 @@ def getStatus(tello):
 
     return (battery, height, flight_time, roll, pitch, yaw, speed_x, speed_y, speed_z, temp)
 
-def main():
+def main():  
     #parsing for argument
     parser = argparse.ArgumentParser(description='DJI Tello Object Tracking\n')
     parser.add_argument('-tello', type=bool, help='Camera source, default is webcam', default=False)
+    parser.add_argument('-src', type=int, default=2, help='Webcam source')
     parser.add_argument('-vsize', nargs='+', type=int, default=[640, 480])
     parser.add_argument('-debug', type=bool, help='Enable debug', default=False)
     parser.add_argument('-box', type=bool, help='Enable bounding box', default=True)
     parser.add_argument('-osd', type=bool, help='Enable on screen display', default=False)
     parser.add_argument('-save', type=bool, help='Save video', default=False)
-
     args = parser.parse_args()
 
     #check source, tello or webcam
@@ -110,7 +110,7 @@ def main():
         frame_read = tello.get_frame_read()
     else:
         print('Camera source is Webcam')
-        cap = cv2.VideoCapture(1)#, cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(args.src)#, cv2.CAP_DSHOW)
         cap.set(3, args.vsize[0])
         cap.set(4, args.vsize[1])
 
