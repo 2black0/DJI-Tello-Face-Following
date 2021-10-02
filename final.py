@@ -64,12 +64,12 @@ def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
             cv2.line(img, (int(imgsize[0]/2), int(imgsize[1]/2)), (int((w/2)+x), int((h/2)+y)), (0, 0, 255), 2)
 
         if osd is True:
-            #fps=img.get(cv2.CAP_PROP_FPS)
+            ##fps=img.get(cv2.CAP_PROP_FPS)
             cv2.putText(img, 'B:'+str(data[0])+' H:'+str(data[1])+' FT:'+str(data[2])+' T:'+str(data[9]), (10, imgsize[1]-10), 2, 1, (0, 255, 0), 2)
             cv2.putText(img, 'R:'+str(data[3])+' P:'+str(data[4])+' Y:'+str(data[5]), (10, 30), 2, 1, (0, 255, 0), 2)
             cv2.putText(img, 'eX:'+str(error[0])+' eY:'+str(error[1])+' eD:'+str(error[2]), (imgsize[0]-350, 30), 2, 1, (0, 255, 0), 2)
-            #cv2.putText(img, 'FPS:'+str(fps), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
-            #cv2.putText(img, 'X:'+str(data[6])+' Y:'+str(data[7])+' Z:'+str(data[8]), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
+            ##cv2.putText(img, 'FPS:'+str(fps), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
+            ##cv2.putText(img, 'X:'+str(data[6])+' Y:'+str(data[7])+' Z:'+str(data[8]), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
 
         if tellos is True and status is True:
             if error[0] < -error_threshold or error[0] >= error_threshold:
