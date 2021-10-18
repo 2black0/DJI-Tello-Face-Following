@@ -5,6 +5,7 @@ import pygame
 import sys
 import logging
 import csv
+import time
 
 faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
@@ -43,11 +44,21 @@ def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
     global size
     global counters
     
+    prev_frame_time = 0
+    new_frame_time = 0
+    
     vel = [0, 0, 0, 0]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5, minSize = (30,30))
 
-    for (x, y, w, h) in faces:
+    #font = cv2.FONT_HERSHEY_SIMPLEX
+    new_frame_time = time.time()
+    fps = 1/(new_frame_time-prev_frame_time)
+    prev_frame_time = new_frame_time
+    fps = int(fps)
+    fps = str(fps)
+
+    for (x, y, w, h) in faces:        
         #bbox = [x, y, w, h]
         cent_X = int(imgsize[0]/2)
         cent_Y = int(imgsize[1]/2)
@@ -70,6 +81,7 @@ def showCam(img, imgsize, tellos, status, data, debug, box, osd, save, video):
             cv2.putText(img, 'eX:'+str(error[0])+' eY:'+str(error[1])+' eD:'+str(error[2]), (imgsize[0]-350, 30), 2, 1, (0, 255, 0), 2)
             ##cv2.putText(img, 'FPS:'+str(fps), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
             ##cv2.putText(img, 'X:'+str(data[6])+' Y:'+str(data[7])+' Z:'+str(data[8]), (imgsize[0]-290, 30), 2, 1, (0, 255, 0), 2)
+            cv2.putText(img, fps, (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
 
         if tellos is True and status is True:
             if error[0] < -error_threshold or error[0] >= error_threshold:
