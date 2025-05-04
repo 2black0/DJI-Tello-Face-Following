@@ -17,7 +17,7 @@ This project implements a face detection and tracking system for the DJI Tello d
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/tello-face-following.git
+git clone https://github.com/2black0/DJI-Tello-Face-Following.git
 cd tello-face-following
 ```
 
