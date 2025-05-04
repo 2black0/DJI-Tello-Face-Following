@@ -1,0 +1,7 @@
+# Core dependencies
+djitellopy==2.5.0        # Tello drone control
+opencv-python==4.5.5.64  # Computer vision operations
+pygame==2.1.3            # Input handling and UI
+
+# Additional dependencies (included in standard library but listed for completeness)
+numpy==1.23.5            # Array manipulation (dependency of OpenCV)
