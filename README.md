@@ -10,6 +10,9 @@ This project implements a face detection and tracking system for the DJI Tello d
 * Option to display the video feed with tracking visualization
 * Option to save the video feed to a file for later analysis
 
+## Demo
+https://youtu.be/ZMhzxzPc_Zs
+
 ## 🛠️ Installation
 
 ### 1. Clone the Repository
