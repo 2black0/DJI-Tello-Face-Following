@@ -11,7 +11,7 @@ This project implements a face detection and tracking system for the DJI Tello d
 * Option to save the video feed to a file for later analysis
 
 ## ▶️ Demo
-[![Video Title](https://img.youtube.com/vi/ZMhzxzPc_Zs/0.jpg)](https://www.youtube.com/watch?v=ZMhzxzPc_Zs) 
+[![Face Tracking DJI Tello with Haar Cascade and PID Controller](https://img.youtube.com/vi/ZMhzxzPc_Zs/0.jpg)](https://www.youtube.com/watch?v=ZMhzxzPc_Zs) 
 
 ## 🛠️ Installation
 
